@@ -1,6 +1,7 @@
 package org.fossasia.openevent.fragments;
 
 import android.content.DialogInterface;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
@@ -24,6 +25,7 @@ import org.fossasia.openevent.R;
 import org.fossasia.openevent.adapters.SessionsListAdapter;
 import org.fossasia.openevent.data.Session;
 import org.fossasia.openevent.dbutils.DbSingleton;
+import org.fossasia.openevent.utils.BookmarksListChangeListener;
 import org.fossasia.openevent.widget.DialogFactory;
 
 import java.text.ParseException;
@@ -43,6 +45,8 @@ public class BookmarksFragment extends BaseFragment implements SearchView.OnQuer
     private final String FRAGMENT_TAG = "FTAG";
     final private String SEARCH = "org.fossasia.openevent.searchText";
     SessionsListAdapter sessionsListAdapter;
+
+    private GridLayoutManager gridLayoutManager;
 
     private static final int bookmarkedSessionList =3;
 
@@ -123,8 +127,14 @@ public class BookmarksFragment extends BaseFragment implements SearchView.OnQuer
             Session session = dbSingleton.getSessionById(id);
             sessionsListAdapter.addItem(i, session);
         }
+        sessionsListAdapter.setBookmarksListChangeListener(new BookmarksListChangeListener() {
+            @Override
+            public void onChange() {
+                onResume();
+            }
+        });
         bookmarkedTracks.setAdapter(sessionsListAdapter);
-        final GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(),spanCount);
+        gridLayoutManager = new GridLayoutManager(getActivity(), spanCount);
         bookmarkedTracks.setLayoutManager(gridLayoutManager);
         bookmarkedTracks.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
             @Override
@@ -190,6 +200,15 @@ public class BookmarksFragment extends BaseFragment implements SearchView.OnQuer
     }
 
     @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        DisplayMetrics displayMetrics = this.getResources().getDisplayMetrics();
+        float width = displayMetrics.widthPixels / displayMetrics.density;
+        int spanCount = (int) (width / 250.00);
+        gridLayoutManager.setSpanCount(spanCount);
+    }
+
+    @Override
     public boolean onQueryTextSubmit(String query) {
         searchView.clearFocus();
         return true;
@@ -211,7 +230,6 @@ public class BookmarksFragment extends BaseFragment implements SearchView.OnQuer
         final List<Session> filteredModelList = filter(Sessions, query.toLowerCase(Locale.getDefault()));
 
         sessionsListAdapter.animateTo(filteredModelList);
-        bookmarkedTracks.scrollToPosition(0);
 
         searchText = query;
         return false;
