@@ -1,6 +1,5 @@
 package org.fossasia.openevent.activities;
 
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
@@ -30,8 +29,6 @@ public class TrackSessionsActivity extends BaseActivity implements SearchView.On
     final private String SEARCH = "org.fossasia.openevent.searchText";
 
     private SessionsListAdapter sessionsListAdapter;
-
-    private GridLayoutManager gridLayoutManager;
 
     private String track;
 
@@ -74,7 +71,7 @@ public class TrackSessionsActivity extends BaseActivity implements SearchView.On
         int spanCount = (int) (width/250.00);
 
         sessionsRecyclerView.setHasFixedSize(true);
-        gridLayoutManager = new GridLayoutManager(this, spanCount);
+        final GridLayoutManager gridLayoutManager = new GridLayoutManager(this,spanCount);
         sessionsRecyclerView.setLayoutManager(gridLayoutManager);
         sessionsListAdapter = new SessionsListAdapter(this, dbSingleton.getSessionbyTracksname(track),trackWiseSessionList);
         sessionsRecyclerView.setAdapter(sessionsListAdapter);
@@ -123,15 +120,6 @@ public class TrackSessionsActivity extends BaseActivity implements SearchView.On
             searchView.setQuery(searchText, false);
         }
         return true;
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        DisplayMetrics displayMetrics = this.getResources().getDisplayMetrics();
-        float width = displayMetrics.widthPixels / displayMetrics.density;
-        int spanCount = (int) (width / 250.00);
-        gridLayoutManager.setSpanCount(spanCount);
     }
 
     @Override

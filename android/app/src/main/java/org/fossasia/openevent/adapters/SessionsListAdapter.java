@@ -35,7 +35,6 @@ import org.fossasia.openevent.data.Speaker;
 import org.fossasia.openevent.data.Track;
 import org.fossasia.openevent.dbutils.DbSingleton;
 import org.fossasia.openevent.receivers.NotificationAlarmReceiver;
-import org.fossasia.openevent.utils.BookmarksListChangeListener;
 import org.fossasia.openevent.utils.ConstantStrings;
 import org.fossasia.openevent.utils.ISO8601Date;
 import org.fossasia.openevent.utils.WidgetUpdater;
@@ -66,11 +65,6 @@ public class SessionsListAdapter extends BaseRVAdapter<Session, SessionsListAdap
 
     private ColorGenerator colorGenerator = ColorGenerator.MATERIAL;
     private TextDrawable.IBuilder drawableBuilder = TextDrawable.builder().round();
-    private BookmarksListChangeListener bookmarksListChangeListener;
-
-    public void setBookmarksListChangeListener(BookmarksListChangeListener listener){
-        this.bookmarksListChangeListener = listener;
-    }
 
     private int color;
 
@@ -193,9 +187,6 @@ public class SessionsListAdapter extends BaseRVAdapter<Session, SessionsListAdap
                 if (dbSingleton.isBookmarked(session.getId())) {
                     dbSingleton.deleteBookmarks(session.getId());
                     holder.sessionBookmarkIcon.setImageResource(R.drawable.ic_bookmark_border_white_24dp);
-                    if(bookmarksListChangeListener != null){
-                        bookmarksListChangeListener.onChange();
-                    }
                     Snackbar.make(v, R.string.removed_bookmark, Snackbar.LENGTH_LONG)
                             .setAction(R.string.undo, new View.OnClickListener() {
                                 @Override
@@ -203,9 +194,6 @@ public class SessionsListAdapter extends BaseRVAdapter<Session, SessionsListAdap
                                     dbSingleton.addBookmarks(session.getId());
                                     holder.sessionBookmarkIcon.setImageResource(R.drawable.ic_bookmark_white_24dp);
                                     WidgetUpdater.updateWidget(context);
-                                    if(bookmarksListChangeListener != null){
-                                        bookmarksListChangeListener.onChange();
-                                    }
                                 }
                             }).show();
                 } else {
